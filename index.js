@@ -9,8 +9,18 @@ module.exports = function headerSections(md) {
 
     function openSection(attrs) {
       var t = new Token('section_open', 'section', 1);
+      const ids = attrs.filter(attr => attr[0] == "id");
+      const nonID_Attrs = attrs.filter(attr => attr[0] != "id");
+
+      // copy ID, add section prefix
+      var id = (
+        (ids.length == 0)
+        ? []
+        : [[ids[0][0], "section--" + ids[0][1]]]
+      );
+
       t.block = true;
-      t.attrs = attrs && attrs.map(function (attr) { return [attr[0], attr[1]] });  // copy
+      t.attrs = [].concat(nonID_Attrs, id);
       return t;
     }
 
@@ -61,10 +71,6 @@ module.exports = function headerSections(md) {
           closeSections(section);
         }
         tokens.push(openSection(token.attrs));
-        if (token.attrIndex('id') !== -1) {
-          // remove ID from token
-          token.attrs.splice(token.attrIndex('id'), 1);
-        }
         sections.push(section);
       }
 
